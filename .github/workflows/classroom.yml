@@ -1,0 +1,60 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: 'Section 1 – Warm-up '
+      id: section-1-warm-up
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Section 1 – Warm-up '
+        setup-command: ''
+        command: make test-s1
+        timeout: 10
+        max-score: 10
+    - name: 'Section 2 – Built-in Functions '
+      id: section-2-built-in-functions
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Section 2 – Built-in Functions '
+        setup-command: ''
+        command: make test-s2
+        timeout: 10
+        max-score: 20
+    - name: Section 3 – Custom Functions
+      id: section-3-custom-functions
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Section 3 – Custom Functions
+        setup-command: ''
+        command: make test-s3
+        timeout: 10
+        max-score: 50
+    - name: Section 4 – Challenge
+      id: section-4-challenge
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Section 4 – Challenge
+        setup-command: ''
+        command: make test-challenge
+        timeout: 10
+        max-score: 20
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        SECTION-1-WARM-UP_RESULTS: "${{steps.section-1-warm-up.outputs.result}}"
+        SECTION-2-BUILT-IN-FUNCTIONS_RESULTS: "${{steps.section-2-built-in-functions.outputs.result}}"
+        SECTION-3-CUSTOM-FUNCTIONS_RESULTS: "${{steps.section-3-custom-functions.outputs.result}}"
+        SECTION-4-CHALLENGE_RESULTS: "${{steps.section-4-challenge.outputs.result}}"
+      with:
+        runners: section-1-warm-up,section-2-built-in-functions,section-3-custom-functions,section-4-challenge
